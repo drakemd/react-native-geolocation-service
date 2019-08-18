@@ -1,6 +1,6 @@
 {
   "name": "react-native-geolocation-service",
-  "version": "3.0.0",
+  "version": "2.0.1",
   "description": "React native geolocation service for iOS and android",
   "main": "js/index.js",
   "scripts": {
@@ -26,9 +26,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Agontuk/react-native-geolocation-service"
-  },
-  "dependencies": {
-    "@react-native-community/geolocation": "^1.4.2"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",

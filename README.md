@@ -7,96 +7,47 @@ This library is created in an attempt to fix the location timeout issue on andro
 > NOTE: Location request can still timeout since many android devices have GPS issue in the hardware level or in the system software level. Check the [FAQ](#faq) for more details.
 
 # Installation
-yarn
 ```bash
 yarn add react-native-geolocation-service
-```
-
-npm
-```bash
-npm install react-native-geolocation-service
 ```
 
 # Compatibility
 | RN Version | Package Version |
 | ---------- | --------------- |
-| 0.60+      | 3.0.0           |
 | 0.57+      | 2.0.0           |
 | <0.57      | 1.1.0           |
 
 # Setup
 
 ## iOS
-You need to include the `NSLocationWhenInUseUsageDescription` key in Info.plist to enable geolocation when using the app. In order to enable geolocation in the background, you need to include the `NSLocationAlwaysUsageDescription` key in Info.plist and add location as a background mode in the 'Capabilities' tab in Xcode.
-
-<details>
-<summary>0.60 or higher</summary>
-
- - Update your `Podfile`
-    ```
-    pod 'react-native-geolocation', path: '../node_modules/@react-native-community/geolocation'
-    ```
- - Then run `pod install` from ios directory
-</details>
-
-<details>
-<summary>0.59 or below</summary>
-
-### Manually link the library on iOS
-
-#### `Open project.xcodeproj in Xcode`
-
-Drag `RNCGeolocation.xcodeproj` to your project on Xcode (usually under the Libraries group on Xcode):
-
-![xcode-add](screenshots/01-ios-add-to-library.png?raw=true)
-
-#### Link `libRNCGeolocation.a` binary with libraries
-
-Click on your main project file (the one that represents the `.xcodeproj`) select `Build Phases` and drag the static library from the `Products` folder inside the Library you are importing to `Link Binary With Libraries` (or use the `+` sign and choose library from the list):
-
-![xcode-link](screenshots/02-ios-add-to-build-phases.png?raw=true)
-
-### Using Cocoapods
-- Update your `Podfile`
-    ```
-    pod 'react-native-geolocation', path: '../node_modules/@react-native-community/geolocation'
-    ```
- - Then run `pod install` from ios directory
-
-</details>
+No additional setup is required, since it uses the React Native's default Geolocation API. Just follow the [React Native documentation](https://facebook.github.io/react-native/docs/geolocation.html#ios) to modify the `.plist` file.
 
 ## Android
-__No additional setup is required for 0.60 or above.__
-
-<details>
-<summary>0.59 or below</summary>
-
 1. In `android/app/build.gradle`
 
     ```gradle
     ...
     dependencies {
         ...
-        implementation project(':react-native-geolocation-service')
+        compile project(':react-native-geolocation-service')
     }
     ```
 
     If you've defined [project-wide properties](https://developer.android.com/studio/build/gradle-tips#configure-project-wide-properties) (recommended) in your root build.gradle, this library will detect the presence of the following properties:
 
     ```gradle
-    buildscript {
-        /**
-         + Project-wide Gradle configuration properties
-         */
-        ext {
-            compileSdkVersion   = 28
-            targetSdkVersion    = 28
-            buildToolsVersion   = "28.0.3"
-            supportLibVersion   = "28.0.0"
-            googlePlayServicesVersion = "16.0.0"
-        }
-        repositories { ... }
-        dependencies { ... }
+    buildscript {...}
+    allprojects {...}
+
+    /**
+     + Project-wide Gradle configuration properties
+     */
+    ext {
+        compileSdkVersion   = 25
+        targetSdkVersion    = 25
+        buildToolsVersion   = "25.0.2"
+        supportLibVersion   = "25.0.1"
+        googlePlayServicesVersion = "11.0.0"
     }
     ```
 
@@ -106,10 +57,10 @@ __No additional setup is required for 0.60 or above.__
     ...
     dependencies {
         ...
-        implementation(project(':react-native-geolocation-service')) {
+        compile(project(':react-native-geolocation-service')) {
             exclude group: 'com.google.android.gms', module: 'play-services-location'
         }
-        implementation 'com.google.android.gms:play-services-location:<insert your play service version here>'
+        compile 'com.google.android.gms:play-services-location:<insert your play service version here>'
     }
     ```
 
@@ -138,7 +89,6 @@ __No additional setup is required for 0.60 or above.__
         }
     }
     ```
-</details>
 
 # Usage
 Since this library was meant to be a drop-in replacement for the RN's Geolocation API, the usage is pretty straight forward, with some extra error cases to handle.
@@ -168,17 +118,6 @@ componentDidMount() {
 ```
 
 # API
-#### `setRNConfiguration(options) (iOS only)`
- - **options**:
-
-    | Name | Type | Default | Description |
-    | -- | -- | -- | -- |
-    | skipPermissionRequests | `bool` | false | If `true`, you must request permissions before using Geolocation APIs. |
-    | authorizationLevel | `string` | -- | Changes whether the user will be asked to give "always" or "when in use" location services permission. Any other value or `auto` will use the default behaviour, where the permission level is based on the contents of your `Info.plist`. Possible values are `whenInUse`, `always` and `auto`. |
-
-#### `requestAuthorization() (iOS only)`
-Request suitable Location permission based on the key configured on pList. If NSLocationAlwaysUsageDescription is set, it will request Always authorization, although if NSLocationWhenInUseUsageDescription is set, it will request InUse authorization.
-
 #### `getCurrentPosition(successCallback, ?errorCallback, ?options)`
  - **successCallback**: Invoked with latest location info.
  - **errorCallback**: Invoked whenever an error is encountered.
@@ -190,8 +129,7 @@ Request suitable Location permission based on the key configured on pList. If NS
     | maximumAge | `ms` | `INFINITY` | How long previous location will be cached |
     | enableHighAccuracy | `bool` | `false` | Use high accuracy mode
     | distanceFilter | `m` | `0` | Minimum displacement in meters
-    | showLocationDialog | `bool` | `true` | Whether to ask to enable location in Android
-    | forceRequestLocation | `bool` | `false` | Force request location even after denying improve accuracy dialog
+    | showLocationDialog | `bool` | `true` | whether to ask to enable location in Android
 
 #### `watchPosition(successCallback, ?errorCallback, ?options)`
  - **successCallback**: Invoked with latest location info.
@@ -205,23 +143,26 @@ Request suitable Location permission based on the key configured on pList. If NS
     | interval | `ms` | `10000` |  Interval for active location updates
     | fastestInterval | `ms` | `5000` | Fastest rate at which your application will receive location updates, which might be faster than `interval` in some situations (for example, if other applications are triggering location updates)
     | showLocationDialog | `bool` | `true` | whether to ask to enable location in Android
-    | forceRequestLocation | `bool` | `false` | Force request location even after denying improve accuracy dialog
 
 #### `clearWatch(watchId)`
  - watchId (id returned by `watchPosition`)
 
-#### `stopObserving()`
-Stops observing for device location changes. In addition, it removes all listeners previously registered.
+Checkout [React Native documentation](https://facebook.github.io/react-native/docs/geolocation.html#reference) to see the list of available methods.
+
 
 # Error Codes
 | Name | Code | Description |
 | --- | --- | --- |
 | PERMISSION_DENIED | 1 | Location permission is not granted |
-| POSITION_UNAVAILABLE | 2 | Location provider not available |
+| POSITION_UNAVAILABLE | 2 | Unable to determine position (not used yet) |
 | TIMEOUT | 3 | Location request timed out |
 | PLAY_SERVICE_NOT_AVAILABLE | 4 | Google play service is not installed or has an older version |
 | SETTINGS_NOT_SATISFIED | 5 | Location service is not enabled or location mode is not appropriate for the current request |
 | INTERNAL_ERROR | -1 | Library crashed for some reason or the `getCurrentActivity()` returned null |
+
+# TODO
+- [x] Implement `watchPosition` & `clearWatch` methods for android
+- [x] Implement `stopObserving` method for android
 
 # FAQ
 1. **Location timeout still happening ?**

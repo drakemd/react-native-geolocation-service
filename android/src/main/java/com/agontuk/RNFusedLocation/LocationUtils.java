@@ -5,9 +5,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.Manifest;
 import android.os.Build;
-import android.text.TextUtils;
-import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
+import androidx.core.app.ActivityCompat;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
@@ -25,31 +23,10 @@ public class LocationUtils {
     }
 
     /**
-     * Check if location is enabled on the device.
-     */
-    public static boolean isLocationEnabled(Context context) {
-        int locationMode = 0;
-        String locationProviders;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            try {
-                locationMode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE);
-            } catch (Settings.SettingNotFoundException e) {
-                return false;
-            }
-
-            return locationMode != Settings.Secure.LOCATION_MODE_OFF;
-        } else {
-            locationProviders = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
-            return !TextUtils.isEmpty(locationProviders);
-        }
-    }
-
-    /**
      * Check if google play service is available on device.
      */
     public static boolean isGooglePlayServicesAvailable(Context context) {
-        int result = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context);
+        int result =  GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context);
 
         // TODO: Handle other possible success types.
         return result == ConnectionResult.SUCCESS || result == ConnectionResult.SERVICE_UPDATING;
